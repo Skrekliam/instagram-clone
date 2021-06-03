@@ -1,0 +1,15 @@
+.header {
+  background-color: #fff;
+  border-bottom: 1px solid lightgrey;
+  padding: 5px;
+  display: flex;
+  margin-bottom: 30px;
+  justify-content: space-between;
+}
+.header-logo {
+  object-fit: contain;
+  padding-left: 10px;
+}
+.header-buttons {
+  right: 15px;
+}

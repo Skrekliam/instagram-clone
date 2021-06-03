@@ -1,0 +1,17 @@
+.newpost{
+    padding: 15px;
+    border-radius: 3px;
+    min-width: 300px;
+    width: 100%;
+    background-color: #fff;
+}
+.newpost__form{
+    display: flex;
+    align-items: center;
+}
+.newpost__image-name{
+    font-style: 11px;
+    display: flex;
+    flex-direction: column;
+    
+}

@@ -1,0 +1,12 @@
+.person-info{
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+    min-width: 300px;
+    width: 100%;
+}
+.person-info__data{
+    margin-left: 10px;
+}
