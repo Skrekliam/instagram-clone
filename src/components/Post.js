@@ -25,10 +25,6 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const heartRef = useRef("");
   const [curLikes, setCurLikes] = useState([]);
 
-  const likeRef = currUser
-    ? db.collection("users").doc(currUser.displayName)
-    : undefined;
-
   useEffect(() => {
     let unsubscribe;
     if (id) {
@@ -50,29 +46,30 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       unsubscribe();
     };
   }, [id]);
-  
 
   useEffect(() => {
     let unsubscribe;
-      unsubscribe = db.collection("posts")
-      .doc(id).onSnapshot((snapshot) => {
+    unsubscribe = db
+      .collection("posts")
+      .doc(id)
+      .onSnapshot((snapshot) => {
         setCurLikes(snapshot.data().likes);
       });
-    
+
     return () => {
-        unsubscribe();
-      
+      unsubscribe();
     };
   }, [id]);
-
-
 
   useEffect(() => {
     let unsubscribe;
     if (currUser) {
-      unsubscribe = likeRef.onSnapshot((snapshot) => {
-        setLiked(snapshot.data().likes.indexOf(id) > -1 ? true : false);
-      });
+      unsubscribe = db
+        .collection("users")
+        .doc(currUser.displayName)
+        .onSnapshot((snapshot) => {
+          setLiked(snapshot.data().likes.indexOf(id) > -1 ? true : false);
+        });
     }
     return () => {
       if (currUser) {
@@ -110,7 +107,8 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const el = heartRef.current;
   const handleLike = (e) => {
     if (!liked && currUser) {
-      likeRef
+      db.collection("users")
+        .doc(currUser.displayName)
         .update({
           likes: firebase.firestore.FieldValue.arrayUnion(id),
         })
@@ -131,7 +129,8 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       }, 1000);
     } else {
       if (liked && currUser) {
-        likeRef
+        db.collection("users")
+          .doc(currUser.displayName)
           .update({
             likes: firebase.firestore.FieldValue.arrayRemove(id),
           })
@@ -177,7 +176,9 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           </div>
         )}
         <div className="post__likesCount">
-          <strong>{curLikes.length} like{curLikes.length === 1 ? '': 's'} </strong>
+          <strong>
+            {curLikes.length} like{curLikes.length === 1 ? "" : "s"}{" "}
+          </strong>
         </div>
       </div>
       <div className="post__text">
