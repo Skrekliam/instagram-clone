@@ -42,6 +42,7 @@ function NewPost({ currUser }) {
               caption: caption,
               imageUrl: url,
               username: currUser.displayName,
+              likes:[]
             });
 
             setTimeout(() => {

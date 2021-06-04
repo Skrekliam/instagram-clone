@@ -68,7 +68,6 @@ function App() {
     db.collection("posts")
       .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) => {
-        console.log(snapshot.docs.map((doc) => doc.data().timestamp));
         setPosts(
           snapshot.docs.map((doc) => ({
             id: doc.id,

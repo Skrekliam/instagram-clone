@@ -22,7 +22,12 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
-  const heartRef = useRef('')
+  const heartRef = useRef("");
+  const [curLikes, setCurLikes] = useState([]);
+
+  const likeRef = currUser
+    ? db.collection("users").doc(currUser.displayName)
+    : undefined;
 
   useEffect(() => {
     let unsubscribe;
@@ -33,16 +38,48 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
         .collection("comments")
         .orderBy("timestamp")
         .onSnapshot((snapshot) =>
-          setComments(snapshot.docs.map((doc) =>({
-            id: doc.id,
-            comment: doc.data(),
-          })))
+          setComments(
+            snapshot.docs.map((doc) => ({
+              id: doc.id,
+              comment: doc.data(),
+            }))
+          )
         );
     }
     return () => {
       unsubscribe();
     };
   }, [id]);
+  
+
+  useEffect(() => {
+    let unsubscribe;
+      unsubscribe = db.collection("posts")
+      .doc(id).onSnapshot((snapshot) => {
+        setCurLikes(snapshot.data().likes);
+      });
+    
+    return () => {
+        unsubscribe();
+      
+    };
+  }, [id]);
+
+
+
+  useEffect(() => {
+    let unsubscribe;
+    if (currUser) {
+      unsubscribe = likeRef.onSnapshot((snapshot) => {
+        setLiked(snapshot.data().likes.indexOf(id) > -1 ? true : false);
+      });
+    }
+    return () => {
+      if (currUser) {
+        unsubscribe();
+      }
+    };
+  }, [id, currUser]);
 
   const postComment = (e) => {
     e.preventDefault();
@@ -52,6 +89,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       username: currUser.displayName,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
+
     setComment("");
   };
 
@@ -71,13 +109,43 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   ); //.toISOString().slice(0, 19).replace('T', ' ')
   const el = heartRef.current;
   const handleLike = (e) => {
-    
-    setLiked(true);
-    el.style.animation = "1s heartAnim ease-in-out";
-    setTimeout(() => {
-      el.style.animation = "none";
-      el.style.transform = "scale(0)";
-    }, 1000);
+    if (!liked && currUser) {
+      likeRef
+        .update({
+          likes: firebase.firestore.FieldValue.arrayUnion(id),
+        })
+        .then(() => console.log("liked ", id))
+        .catch((err) => console.log(err));
+
+      el.style.animation = "1s heartAnim ease-in-out";
+      setTimeout(() => {
+        el.style.animation = "none";
+        el.style.transform = "scale(0)";
+        db.collection("posts")
+          .doc(id)
+          .update({
+            likes: firebase.firestore.FieldValue.arrayUnion(currUser.uid),
+          })
+          .then(() => console.log("add like to post ", id))
+          .catch((err) => console.log(err));
+      }, 1000);
+    } else {
+      if (liked && currUser) {
+        likeRef
+          .update({
+            likes: firebase.firestore.FieldValue.arrayRemove(id),
+          })
+          .then(() => console.log("unliked ", id))
+          .catch((err) => console.log(err));
+        db.collection("posts")
+          .doc(id)
+          .update({
+            likes: firebase.firestore.FieldValue.arrayRemove(currUser.uid),
+          })
+          .then(() => console.log("remove like to post ", id))
+          .catch((err) => console.log(err));
+      }
+    }
   };
   const classes = useStyles();
   return (
@@ -92,18 +160,24 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       </div>
       <div className="post__image" onDoubleClick={handleLike}>
         <img src={imageUrl} alt="" />
-        <FavoriteRounded ref={heartRef} className="post__imageHeart" color="error" />
+        <FavoriteRounded
+          ref={heartRef}
+          className="post__imageHeart"
+          color="error"
+        />
       </div>
       <div className="post__likes">
-        <div className="post__likesButton">
-          {liked ? (
-            <FavoriteRounded onClick={() => setLiked(false)} color="error" />
-          ) : (
-            <FavoriteBorderRounded onClick={() => setLiked(true)} />
-          )}
-        </div>
+        {currUser && (
+          <div className="post__likesButton">
+            {liked ? (
+              <FavoriteRounded onClick={handleLike} color="error" />
+            ) : (
+              <FavoriteBorderRounded onClick={handleLike} />
+            )}
+          </div>
+        )}
         <div className="post__likesCount">
-          <strong>0 likes </strong>
+          <strong>{curLikes.length} like{curLikes.length === 1 ? '': 's'} </strong>
         </div>
       </div>
       <div className="post__text">
@@ -113,7 +187,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           </p>
         )}
         <div className="post__comments">
-          {comments.map(({id, comment}) => (
+          {comments.map(({ id, comment }) => (
             <p key={id}>
               <strong>{comment.username}</strong> {comment.text}
             </p>
