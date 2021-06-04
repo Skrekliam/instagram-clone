@@ -2,6 +2,7 @@ body {
   /* margin: 10px; */
   background-color: #fafafa;
   margin-bottom: 6vh;
+  transition: .5s ease-in-out;
 }
 .modal__fields {
   display: flex;

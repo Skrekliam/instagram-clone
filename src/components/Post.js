@@ -1,8 +1,9 @@
 import { Avatar, makeStyles } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { db } from "../firebase";
 import firebase from "firebase";
 import "./Post.css";
+import { FavoriteRounded, FavoriteBorderRounded } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
 function Post({ id, username, imageUrl, caption, post, currUser }) {
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [liked, setLiked] = useState(false);
+  const heartRef = useRef('')
+
   useEffect(() => {
     let unsubscribe;
     if (id) {
@@ -27,7 +31,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
         .collection("posts")
         .doc(id)
         .collection("comments")
-        .orderBy('timestamp')
+        .orderBy("timestamp")
         .onSnapshot((snapshot) =>
           setComments(snapshot.docs.map((doc) => doc.data()))
         );
@@ -62,7 +66,16 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const date = formatter.format(
     new Date(post.timestamp ? post.timestamp.seconds * 1000 : 0)
   ); //.toISOString().slice(0, 19).replace('T', ' ')
-
+  const el = heartRef.current;
+  const handleLike = (e) => {
+    
+    setLiked(true);
+    el.style.animation = "1s heartAnim ease-in-out";
+    setTimeout(() => {
+      el.style.animation = "none";
+      el.style.transform = "scale(0)";
+    }, 1000);
+  };
   const classes = useStyles();
   return (
     <div className="post" key={id}>
@@ -74,11 +87,28 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
         />
         <h4>{username}</h4>
       </div>
-      <img className="post__image" src={imageUrl} alt="" />
+      <div className="post__image" onDoubleClick={handleLike}>
+        <img src={imageUrl} alt="" />
+        <FavoriteRounded ref={heartRef} className="post__imageHeart" color="error" />
+      </div>
+      <div className="post__likes">
+        <div className="post__likesButton">
+          {liked ? (
+            <FavoriteRounded onClick={() => setLiked(false)} color="error" />
+          ) : (
+            <FavoriteBorderRounded onClick={() => setLiked(true)} />
+          )}
+        </div>
+        <div className="post__likesCount">
+          <strong>0 likes </strong>
+        </div>
+      </div>
       <div className="post__text">
-        <p>
-          <strong>{username}</strong> {caption}
-        </p>
+        {caption && (
+          <p>
+            <strong>{username}</strong> {caption}
+          </p>
+        )}
         <div className="post__comments">
           {comments.map((el) => (
             <p>

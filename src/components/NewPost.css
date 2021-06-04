@@ -13,5 +13,6 @@
     font-style: 11px;
     display: flex;
     flex-direction: column;
+    overflow-wrap: normal;
     
 }

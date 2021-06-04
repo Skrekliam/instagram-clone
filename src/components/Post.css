@@ -4,12 +4,41 @@
   max-width: 600px;
   margin-bottom: 25px;
 }
-.post__image {
+.post__image{
+  position: relative;
+  text-align: center;
+}
+.post__image img{
   width: 100%;
   object-fit: contain;
   border-bottom: 1px solid lightgrey;
   border-top: 1px solid lightgrey;
 }
+.post__imageHeart{
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform: scale(0);
+}
+@keyframes heartAnim {
+  0%{
+    transform: scale(6);
+    opacity: 0;
+  }15%{
+    opacity: 1;
+    transform: scale(7);
+  } 30% {
+    opacity: 1;
+    transform: scale(6.5);
+  } 100% {
+    opacity: 0;
+    transform: scale(6);
+  }
+}
+
+
 .post__header {
   display: flex;
   align-items: center;
@@ -32,7 +61,7 @@
 .post__input {
   flex: 1;
   border: none;
-  padding:10px;
+  padding: 10px;
   border-top: 1px solid lightgrey;
   border-bottom: 1px solid lightgrey;
   border-left: 1px solid lightgrey;
@@ -43,10 +72,28 @@
   border-top: 1px solid lightgrey;
   border-bottom: 1px solid lightgrey;
   border-right: 1px solid lightgrey;
-  color:#6082a3;
+  color: #6082a3;
   background-color: transparent;
 }
-.post__comments p{
+.post__comments p {
   margin: 0;
+  font-style: 10px;
+}
+.post__likes{
+  transition: 1s ease-in-out;
+  padding: 10px 0 0 10px ;
+  display: flex;
+  align-items: center;
+}
+.post__likes strong{
+  padding-left: 5px;
+}
+.post__likesButton:hover{
+  transform: scale(1.05);
+  cursor: pointer;
+}
 
+.post__likesCount{
+  
+  cursor: pointer;
 }
