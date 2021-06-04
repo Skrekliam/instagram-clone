@@ -33,7 +33,10 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
         .collection("comments")
         .orderBy("timestamp")
         .onSnapshot((snapshot) =>
-          setComments(snapshot.docs.map((doc) => doc.data()))
+          setComments(snapshot.docs.map((doc) =>({
+            id: doc.id,
+            comment: doc.data(),
+          })))
         );
     }
     return () => {
@@ -110,9 +113,9 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           </p>
         )}
         <div className="post__comments">
-          {comments.map((el) => (
-            <p>
-              <strong>{el.username}</strong> {el.text}
+          {comments.map(({id, comment}) => (
+            <p key={id}>
+              <strong>{comment.username}</strong> {comment.text}
             </p>
           ))}
         </div>
