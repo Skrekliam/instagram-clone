@@ -68,7 +68,7 @@ function App() {
     db.collection("posts")
       .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) => {
-        console.log(snapshot.docs.map((doc) => doc.data().timestamp ))
+        console.log(snapshot.docs.map((doc) => doc.data().timestamp));
         setPosts(
           snapshot.docs.map((doc) => ({
             id: doc.id,
@@ -87,17 +87,40 @@ function App() {
 
   const formSubmit = (event) => {
     event.preventDefault();
+
     if (action === "Register") {
-      auth
-        .createUserWithEmailAndPassword(email, password)
-        .then((authUser) => {
-          setOpen(false);
-          setErrors("");
-          return authUser.user.updateProfile({
-            displayName: username,
-          });
-        })
-        .catch((err) => setErrors(err));
+      db.collection("users")
+        .doc(username)
+        .get()
+        .then((docSnapshot) => {
+          if (docSnapshot.exists) {
+            setErrors({ message: "Username already taken" });
+          } else {
+            auth
+              .createUserWithEmailAndPassword(email, password)
+              .then((authUser) => {
+                setOpen(false);
+                setErrors("");
+                db.collection("users")
+                  .doc(username)
+                  .set({
+                    uid: authUser.user.uid,
+                    posts: [],
+                    likes: [],
+                  })
+                  .then(() => {
+                    console.log("Document successfully written!");
+                  })
+                  .catch((error) => {
+                    console.error("Error writing document: ", error);
+                  });
+                return authUser.user.updateProfile({
+                  displayName: username,
+                });
+              })
+              .catch((err) => setErrors(err));
+          }
+        });
     } else {
       auth
         .signInWithEmailAndPassword(email, password)
@@ -147,8 +170,9 @@ function App() {
                   id="usename-required"
                   label="Username"
                   value={username}
-                  inputProps={{ maxLength: 12, minLength: 4 }}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) =>
+                    setUsername(e.target.value.replace(/[\W.]/g, ""))
+                  }
                 />
               )}
               <TextField
