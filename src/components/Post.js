@@ -1,9 +1,20 @@
-import { Avatar, makeStyles } from "@material-ui/core";
+import { Avatar, makeStyles, Modal } from "@material-ui/core";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../firebase";
 import firebase from "firebase";
 import "./Post.css";
 import { FavoriteRounded, FavoriteBorderRounded } from "@material-ui/icons";
+
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,6 +27,15 @@ const useStyles = makeStyles((theme) => ({
     width: theme.spacing(4.5),
     height: theme.spacing(4.5),
   },
+  paper: {
+    position: "absolute",
+    maxWidth: 400,
+    width: "80%",
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
 }));
 
 function Post({ id, username, imageUrl, caption, post, currUser }) {
@@ -24,6 +44,8 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const [liked, setLiked] = useState(false);
   const heartRef = useRef("");
   const [curLikes, setCurLikes] = useState([]);
+  const [likesModal, setLikesModal] = useState(false);
+  const [modalStyle] = useState(getModalStyle);
 
   useEffect(() => {
     let unsubscribe;
@@ -146,6 +168,11 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       }
     }
   };
+
+  const handleGetUsersLikes = () => {
+    setLikesModal(true);
+  };
+
   const classes = useStyles();
   return (
     <div className="post" key={id}>
@@ -176,8 +203,23 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           </div>
         )}
         <div className="post__likesCount">
+          <Modal
+            open={likesModal}
+            onClose={() => setLikesModal(false)}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+            className="modal"
+          >
+              <div style={modalStyle} className={classes.paper}>
+            {post.likes.map(el => <p>{el}</p>)}
+            </div>
+          </Modal>
+          
           <strong>
-            {curLikes.length} like{curLikes.length === 1 ? "" : "s"}{" "}
+            {curLikes.length}{" "}
+            <span onClick={handleGetUsersLikes}>
+              like{curLikes.length === 1 ? "" : "s"}{" "}
+            </span>
           </strong>
         </div>
       </div>
