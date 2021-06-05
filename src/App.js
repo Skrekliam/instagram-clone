@@ -14,6 +14,8 @@ import {
   MessageRounded,
   MessageOutlined,
 } from "@material-ui/icons";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import Profile from "./components/Profile";
 
 function getModalStyle() {
   const top = 50;
@@ -210,33 +212,44 @@ function App() {
 
       <Header handleOpen={handleOpen} currUser={currUser} />
       {/* start routing */}
-      <div className="app__page">
-        <div className="app__page__posts">
-          {posts.map(({ id, post }) => (
-            <Post
-              id={id}
-              key={id}
-              currUser={currUser}
-              // sec={post.timestamp? post.timestamp.seconds : 2}
-              username={post.username}
-              imageUrl={post.imageUrl}
-              caption={post.caption}
-              post={post}
-            />
-          ))}
-        </div>
-        <Box display={{ xs: "none", md: "block", lg: "block" }}>
-          <div className="app__page__right-side">
-            {/* Right side ->   */}
-            {/* Profile pic + name + id  */}
-            <PersonInfo currUser={currUser} />
-            {window.innerWidth > 960 && <NewPost currUser={currUser} />}{" "}
-            {/* Add post */}
-          </div>
-        </Box>
-      </div>
-      {/* end routing */}
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <div className="app__page">
+              <div className="app__page__posts">
+                {posts.map(({ id, post }) => (
+                  <Post
+                    id={id}
+                    key={id}
+                    currUser={currUser}
+                    // sec={post.timestamp? post.timestamp.seconds : 2}
+                    username={post.username}
+                    imageUrl={post.imageUrl}
+                    caption={post.caption}
+                    post={post}
+                  />
+                ))}
+              </div>
+              <Box display={{ xs: "none", md: "block", lg: "block" }}>
+                <div className="app__page__right-side">
+                  {/* Right side ->   */}
+                  {/* Profile pic + name + id  */}
+                  <PersonInfo currUser={currUser} />
+                  {window.innerWidth > 960 && (
+                    <NewPost currUser={currUser} />
+                  )}{" "}
+                  {/* Add post */}
+                </div>
+              </Box>
+            </div>
 
+            {/* end routing */}
+          </Route>
+          <Route exact path="/:currId">
+            <Profile currUser={currUser}/>
+          </Route>
+        </Switch>
+      </Router>
       <Box display={{ xs: "block", md: "none", lg: "none" }}>
         <div className="app_bottom-menu">
           {/* home */}

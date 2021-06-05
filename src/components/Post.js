@@ -4,6 +4,9 @@ import { db } from "../firebase";
 import firebase from "firebase";
 import "./Post.css";
 import { FavoriteRounded, FavoriteBorderRounded } from "@material-ui/icons";
+import {
+  Link,
+} from "react-router-dom";
 
 function getModalStyle() {
   const top = 50;
@@ -172,6 +175,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
   const handleGetUsersLikes = () => {
     setLikesModal(true);
   };
+  const link = `/${username}`;
 
   const classes = useStyles();
   return (
@@ -182,7 +186,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           src="/static/images/avatar/1.png"
           className={classes.small}
         />
-        <h4>{username}</h4>
+        <h4><Link to={link}>{username}</Link></h4>
       </div>
       <div className="post__image" onDoubleClick={handleLike}>
         <img src={imageUrl} alt="" />
