@@ -44,7 +44,14 @@ function NewPost({ currUser }) {
               username: currUser.displayName,
               likes:[]
             });
-
+            db.collection("users")
+            .doc(currUser.displayName)
+            .update({
+              posts: firebase.firestore.FieldValue.arrayUnion(currUser.uid),
+            })
+            .then(() => console.log("add post to user "))
+            .catch((err) => console.log(err));
+            
             setTimeout(() => {
               setProgress(0);
               setCaption("");
