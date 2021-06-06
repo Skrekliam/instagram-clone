@@ -186,7 +186,7 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
           src="/static/images/avatar/1.png"
           className={classes.small}
         />
-        <h4><Link to={link}>{username}</Link></h4>
+        <h4><Link className="post__Link" to={link}>{username}</Link></h4>
       </div>
       <div className="post__image" onDoubleClick={handleLike}>
         <img src={imageUrl} alt="" />
@@ -230,13 +230,13 @@ function Post({ id, username, imageUrl, caption, post, currUser }) {
       <div className="post__text">
         {caption && (
           <p>
-            <strong>{username}</strong> {caption}
+            <strong><Link className="post__Link" to={`/${username}`} >{username}</Link></strong> {caption}
           </p>
         )}
         <div className="post__comments">
           {comments.map(({ id, comment }) => (
             <p key={id}>
-              <strong>{comment.username}</strong> {comment.text}
+              <strong><Link className="post__Link" to={`/${comment.username}`} >{comment.username}</Link></strong> {comment.text}
             </p>
           ))}
         </div>

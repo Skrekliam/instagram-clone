@@ -24,3 +24,13 @@
 .profile__headerLikedPosts{
     margin-left: 25px;
 }
+.profile__posts{
+    padding:15px;
+    display: flex;
+    justify-content: space-around;
+}
+.profile__post{
+    min-height: 350px;
+    margin:15px;
+
+}

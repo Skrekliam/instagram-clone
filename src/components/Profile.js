@@ -29,72 +29,81 @@ function Profile({ currUser }) {
           setUserData(false);
         }
       });
-  }, []);
+  }, [currId]);
+
+  let tmpArr = [];
 
   useEffect(() => {
     if (userData.posts) {
-      userData.posts.map((el) => {
-        db.collection("posts")
-          .doc(el)
+      setPosts([]);
+      let resultTracks = [];
+      userData.posts.forEach((id) => {
+        let t = db
+          .collection("posts")
+          .doc(id)
           .get()
-          .then((doc) => {
-            
-            // console.log(doc.data());
-            setPosts(
-              // (prevState) =>
-              posts.push(doc.data())
-              // prevState.concat(doc.data())
-            );
-            // console.log(posts);
-          });
+          .then((res) =>
+            setPosts((prevState) => [
+              ...prevState,
+              { id: id, data: res.data() },
+            ])
+          );
+        resultTracks.push(t);
       });
+      // db.collection("posts")
+      //   .doc()
+      //   .get()
+      //   .then((snapshot) => {
+      //     setPosts((prevState) => [...prevState, snapshot.data()]);
+      //   });
     }
+  }, [userData.posts]);
 
-  }, [userData]);
   console.log(posts);
-
-  // console.log(userData.posts);
   return (
     <div className="profile">
       {userData ? (
-        <div className="profile__header">
-          <div className="profile__headerAvatar">
-            <Avatar
-              alt={currId}
-              src="/static/images/avatar/1.png"
-              className={classes.big}
-            />
-          </div>
+        <>
+          <div className="profile__header">
+            <div className="profile__headerAvatar">
+              <Avatar
+                alt={currId}
+                src="/static/images/avatar/1.png"
+                className={classes.big}
+              />
+            </div>
 
-          <div className="profile__headerInfo">
-            <div className="profile__headerName">
-              <h1>{currId}</h1>
-            </div>
-            <div className="profile__headerData">
-              <div className="profile__headerDataPostsCount">
-                <strong>{userData.posts?.length}</strong> posts
+            <div className="profile__headerInfo">
+              <div className="profile__headerName">
+                <h1>{currId}</h1>
               </div>
-              <div className="profile__headerLikedPosts">
-                <strong>{userData.likes?.length}</strong> liked posts
+              <div className="profile__headerData">
+                <div className="profile__headerDataPostsCount">
+                  <strong>{userData.posts?.length}</strong> posts
+                </div>
+                <div className="profile__headerLikedPosts">
+                  <strong>{userData.likes?.length}</strong> liked posts
+                </div>
               </div>
             </div>
           </div>
-{/* 
           <div className="profile__posts">
-          {posts?.map(({ id, post }) => (
-                  <Post
-                    id={id}
-                    key={id}
-                    currUser={currUser}
-                    // sec={post.timestamp? post.timestamp.seconds : 2}
-                    username={post.username}
-                    imageUrl={post.imageUrl}
-                    caption={post.caption}
-                    post={post}
-                  />
-                ))}
-          </div> */}
-        </div> 
+            {posts.map(({ id, data }) => (
+              <div className="profile__post">
+                <Post
+                  id={id}
+                  key={id}
+                  currUser={currUser}
+                  // sec={post.timestamp? post.timestamp.seconds : 2}
+                  username={data.username}
+                  imageUrl={data.imageUrl}
+                  caption={data.caption}
+                  post={data}
+                />
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <h1>No user with this username</h1>
       )}

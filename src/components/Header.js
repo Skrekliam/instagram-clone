@@ -22,6 +22,8 @@ function Header({ handleOpen, currUser }) {
         className="header__logo"
         src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
         alt="Instagram Logo"
+        onClick={()=> window.location = '/'}
+        style={{cursor: 'pointer'}}
       />
       <div className="header__buttons">
         {currUser ? (
